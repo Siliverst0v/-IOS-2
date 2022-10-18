@@ -8,7 +8,7 @@
 import Foundation
 import UIKit
 
-final class CollectionViewCell: UICollectionViewCell {
+final class DivisionNameCell: UICollectionViewCell {
     
     static var reuseIdentifier: String { "\(Self.self)" }
     override var isSelected: Bool {
@@ -63,7 +63,7 @@ final class CollectionViewCell: UICollectionViewCell {
     }
 }
 
-extension CollectionViewCell {
+extension DivisionNameCell {
     func configure(with presenter: PresenterProtocol, for indexPath: IndexPath) {
         let divisionName = presenter.getDivision(for: indexPath)
         divisionLabel.text = divisionName

@@ -11,7 +11,6 @@ import UIKit
 final class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSource, UICollectionViewDelegate, UICollectionViewDataSource {
     
     private var presenter: PresenterProtocol = Presenter()
-    private let collectionView = CollectionView()
     private let tableView = TableView(frame: .zero, style: .plain)
     
     override func viewDidLoad() {
@@ -32,7 +31,7 @@ final class ViewController: UIViewController, UITableViewDelegate, UITableViewDa
     func setupCollectionView() {
         tableView.delegate = self
         tableView.dataSource = self
-    
+        
         view.addSubview(tableView)
         
         NSLayoutConstraint.activate([
@@ -44,28 +43,48 @@ final class ViewController: UIViewController, UITableViewDelegate, UITableViewDa
         ])
     }
     //MARK: - Table View DataSource
+    func numberOfSections(in tableView: UITableView) -> Int {
+        2
+    }
+    
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        presenter.teams.count
+        if section == 0 {
+            return 1
+        }
+        return presenter.teams.count
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: TableViewCell.reuseIdentifier, for: indexPath) as! TableViewCell
+        if indexPath.section == 0 {
+            let cell = tableView.dequeueReusableCell(withIdentifier: RandomImageCell.reuseIdentifier, for: indexPath) as! RandomImageCell
+            cell.collectionView.delegate = self
+            cell.collectionView.dataSource = self
+            cell.collectionView.reloadData()
+            return cell
+        }
+        let cell = tableView.dequeueReusableCell(withIdentifier: TableViewTeamCell.reuseIdentifier, for: indexPath) as! TableViewTeamCell
         cell.configure(with: presenter, for: indexPath)
         return cell
     }
     
     func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
+        if section == 0 {
+            return UITableViewHeaderFooterView()
+        }
         if let header = tableView.dequeueReusableHeaderFooterView(withIdentifier: TableViewHeaderView.reuseIdentifier) as? TableViewHeaderView {
-        header.divisions.delegate = self
-        header.divisions.dataSource = self
-        header.divisions.reloadData()
-        return header
+            header.collectionView.delegate = self
+            header.collectionView.dataSource = self
+            header.collectionView.reloadData()
+            return header
         }
         return UITableViewHeaderFooterView()
     }
     
     func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
-        50
+        if section == 0 {
+            return 0
+        }
+       return 50
     }
     
     //MARK: - Collection View DataSource
@@ -74,14 +93,28 @@ final class ViewController: UIViewController, UITableViewDelegate, UITableViewDa
     }
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+        if section == 0 {
+            return 4
+        }
         let divisions = presenter.teams.compactMap{ $0.team.division.rawValue }
         return Array(Set(divisions)).count
     }
-
+    
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: CollectionViewCell.reuseIdentifier, for: indexPath) as? CollectionViewCell
+        if collectionView.tag == 1 {
+            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: ImageViewCell.reuseIdentifier, for: indexPath) as! ImageViewCell
+            cell.configure(with: presenter, for: indexPath)
+            return cell
+        }
+        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: DivisionNameCell.reuseIdentifier, for: indexPath) as? DivisionNameCell
         cell?.configure(with: presenter, for: indexPath)
-        return cell ?? CollectionViewCell()
+        return cell ?? DivisionNameCell()
     }
 }
 
+extension UITableViewCell {
+    open override func addSubview(_ view: UIView) {
+        super.addSubview(view)
+        sendSubviewToBack(contentView)
+    }
+}
