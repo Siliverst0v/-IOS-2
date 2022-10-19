@@ -15,6 +15,7 @@ final class TeamCellView: UITableViewCell {
     private let image: UIImageView = {
         let view = UIImageView()
         view.translatesAutoresizingMaskIntoConstraints = false
+        view.image = UIImage(systemName: "camera")?.withTintColor(.lightGray)
         return view
     }()
     
@@ -105,12 +106,50 @@ extension TeamCellView {
         divisionLabel.text = team.team.division.rawValue
         
         DispatchQueue.global().async {
-            guard let imageUrl = URL(string: team.team.image) else {return}
-            guard let imageData = try? Data(contentsOf: imageUrl) else {return}
+            guard let imageUrl = URL(string: team.team.image) else { return }
+            guard let imageData = try? Data(contentsOf: imageUrl) else { return }
             
-            DispatchQueue.main.async {
-                self.image.image = UIImage(data: imageData)
+            if let cachedImage = ImageCache.shared.object(forKey: imageUrl.absoluteString as NSString) {
+                print("CACHE IMAGE")
+                DispatchQueue.main.async {
+                    self.image.image = cachedImage
+                }
             }
+            
+            URLSession.shared.dataTask(with: imageUrl) { data, response, error in
+                if let error = error { print(error); return }
+                guard let data = data, let response = response else { return }
+                guard let responseURL = response.url else { return }
+                
+                if responseURL.absoluteString != team.team.image { return }
+                
+                DispatchQueue.main.async {
+                    self.image.image = UIImage(data: imageData)
+                }
+                
+                self.saveImageToCache(data: data, url: imageUrl)
+                
+            }.resume()
         }
     }
+    
+    private func saveImageToCache(data: Data, url: URL) {
+        if let image = UIImage(data: data) {
+            ImageCache.shared.setObject(image, forKey: url.absoluteString as NSString)
+        }
+    }
+    
+    private func getCachedImage(url: URL) -> UIImage? {
+        if let cacheResponse = URLCache.shared.cachedResponse(for: URLRequest(url: url)) {
+            return UIImage(data: cacheResponse.data)
+        }
+        return nil
+    }
+}
+
+class ImageCache {
+    
+    private init() {}
+    
+    static let shared = NSCache<NSString, UIImage>()
 }
