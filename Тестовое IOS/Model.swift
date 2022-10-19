@@ -13,7 +13,7 @@ struct WelcomeElement: Codable {
 }
 
 // MARK: - Team
-struct Team: Codable, Hashable {
+struct Team: Codable {
     let id, khlID: Int
     let name, location: String
     let image: String

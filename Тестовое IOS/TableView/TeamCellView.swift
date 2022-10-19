@@ -8,7 +8,7 @@
 import Foundation
 import UIKit
 
-final class TableViewTeamCell: UITableViewCell {
+final class TeamCellView: UITableViewCell {
     
     static var reuseIdentifier: String { "\(Self.self)" }
     
@@ -96,7 +96,7 @@ final class TableViewTeamCell: UITableViewCell {
     }
 }
 
-extension TableViewTeamCell {
+extension TeamCellView {
     func configure(with presenter: PresenterProtocol, for indexPath: IndexPath) {
         let team = presenter.getTeam(for: indexPath)
         titleLabel.text = team.team.name

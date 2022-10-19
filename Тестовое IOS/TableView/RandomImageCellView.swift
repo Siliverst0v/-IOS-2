@@ -8,7 +8,7 @@
 import Foundation
 import UIKit
 
-final class RandomImageCell: UITableViewCell {
+final class RandomImageCellView: UITableViewCell {
     
     static var reuseIdentifier: String { "\(Self.self)" }
         

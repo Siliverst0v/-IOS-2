@@ -17,7 +17,7 @@ final class ViewController: UIViewController, UITableViewDelegate, UITableViewDa
         super.viewDidLoad()
         view.backgroundColor = .white
         fetchTeams()
-        setupCollectionView()
+        setupTableView()
     }
     
     private func fetchTeams() {
@@ -28,10 +28,9 @@ final class ViewController: UIViewController, UITableViewDelegate, UITableViewDa
         }
     }
     
-    func setupCollectionView() {
+    func setupTableView() {
         tableView.delegate = self
         tableView.dataSource = self
-        
         view.addSubview(tableView)
         
         NSLayoutConstraint.activate([
@@ -42,6 +41,7 @@ final class ViewController: UIViewController, UITableViewDelegate, UITableViewDa
             tableView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
         ])
     }
+    
     //MARK: - Table View DataSource
     func numberOfSections(in tableView: UITableView) -> Int {
         2
@@ -56,35 +56,34 @@ final class ViewController: UIViewController, UITableViewDelegate, UITableViewDa
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         if indexPath.section == 0 {
-            let cell = tableView.dequeueReusableCell(withIdentifier: RandomImageCell.reuseIdentifier, for: indexPath) as! RandomImageCell
+            let cell = tableView.dequeueReusableCell(withIdentifier: RandomImageCellView.reuseIdentifier, for: indexPath) as! RandomImageCellView
             cell.collectionView.delegate = self
             cell.collectionView.dataSource = self
             cell.collectionView.reloadData()
             return cell
         }
-        let cell = tableView.dequeueReusableCell(withIdentifier: TableViewTeamCell.reuseIdentifier, for: indexPath) as! TableViewTeamCell
+        let cell = tableView.dequeueReusableCell(withIdentifier: TeamCellView.reuseIdentifier, for: indexPath) as! TeamCellView
         cell.configure(with: presenter, for: indexPath)
         return cell
     }
     
     func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
-        if section == 0 {
-            return UITableViewHeaderFooterView()
-        }
-        if let header = tableView.dequeueReusableHeaderFooterView(withIdentifier: TableViewHeaderView.reuseIdentifier) as? TableViewHeaderView {
-            header.collectionView.delegate = self
-            header.collectionView.dataSource = self
-            header.collectionView.reloadData()
-            return header
+        if section == 1 {
+            if let header = tableView.dequeueReusableHeaderFooterView(withIdentifier: TableViewHeaderView.reuseIdentifier) as? TableViewHeaderView {
+                header.collectionView.delegate = self
+                header.collectionView.dataSource = self
+                header.collectionView.reloadData()
+                return header
+            }
         }
         return UITableViewHeaderFooterView()
     }
     
     func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
-        if section == 0 {
-            return 0
+        if section == 1 {
+            return 50
         }
-       return 50
+       return 0
     }
     
     //MARK: - Collection View DataSource
@@ -110,11 +109,16 @@ final class ViewController: UIViewController, UITableViewDelegate, UITableViewDa
         cell?.configure(with: presenter, for: indexPath)
         return cell ?? DivisionNameCell()
     }
-}
-
-extension UITableViewCell {
-    open override func addSubview(_ view: UIView) {
-        super.addSubview(view)
-        sendSubviewToBack(contentView)
+    
+    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        if collectionView.tag == 2 {
+            guard let cell = collectionView.cellForItem(at: indexPath) as? DivisionNameCell else {return}
+            if let index = presenter.teams.firstIndex(where: {$0.team.division.rawValue == cell.divisionLabel.text}) {
+                let indexPath = IndexPath(row: index, section: 1)
+                tableView.scrollToRow(at: indexPath, at: .top, animated: true)
+            }
+        }
     }
 }
+
+

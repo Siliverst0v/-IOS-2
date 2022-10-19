@@ -32,8 +32,8 @@ final class TableView: UITableView {
         isScrollEnabled = true
         rowHeight = 100
         
-        register(TableViewTeamCell.self, forCellReuseIdentifier: TableViewTeamCell.reuseIdentifier)
-        register(RandomImageCell.self, forCellReuseIdentifier: RandomImageCell.reuseIdentifier)
+        register(TeamCellView.self, forCellReuseIdentifier: TeamCellView.reuseIdentifier)
+        register(RandomImageCellView.self, forCellReuseIdentifier: RandomImageCellView.reuseIdentifier)
         register(TableViewHeaderView.self, forHeaderFooterViewReuseIdentifier: TableViewHeaderView.reuseIdentifier)
     }
 }
