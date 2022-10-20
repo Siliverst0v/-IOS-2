@@ -153,3 +153,12 @@ class ImageCache {
     
     static let shared = NSCache<NSString, UIImage>()
 }
+
+class StructWrapper<T>: NSObject {
+
+    let value: T
+
+    init(_ _struct: T) {
+        self.value = _struct
+    }
+}

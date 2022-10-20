@@ -13,6 +13,18 @@ final class ViewController: UIViewController, UITableViewDelegate, UITableViewDa
     private var presenter: PresenterProtocol = Presenter()
     private let tableView = TableView(frame: .zero, style: .plain)
     
+    private let cityButton: UIButton = {
+        let button = UIButton()
+        button.translatesAutoresizingMaskIntoConstraints = false
+        button.setTitle("Москва", for: .normal)
+        button.titleLabel?.font = .systemFont(ofSize: 17, weight: .bold)
+        button.setTitleColor( UIColor.black, for: .normal)
+        button.setImage(UIImage(systemName: "chevron.down"), for: .normal)
+        button.tintColor = .black
+        button.semanticContentAttribute = .forceRightToLeft
+        return button
+    }()
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .white
@@ -32,10 +44,15 @@ final class ViewController: UIViewController, UITableViewDelegate, UITableViewDa
         tableView.delegate = self
         tableView.dataSource = self
         view.addSubview(tableView)
+        view.addSubview(cityButton)
         
         NSLayoutConstraint.activate([
             
-            tableView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
+            cityButton.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
+            cityButton.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 30),
+            cityButton.heightAnchor.constraint(equalToConstant: 50),
+            
+            tableView.topAnchor.constraint(equalTo: cityButton.bottomAnchor),
             tableView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             tableView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
             tableView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
