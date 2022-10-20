@@ -105,31 +105,8 @@ extension TeamCellView {
         conferenceLabel.text = team.team.conference.rawValue
         divisionLabel.text = team.team.division.rawValue
         
-        DispatchQueue.global().async {
-            guard let imageUrl = URL(string: team.team.image) else { return }
-            guard let imageData = try? Data(contentsOf: imageUrl) else { return }
-            
-            if let cachedImage = ImageCache.shared.object(forKey: imageUrl.absoluteString as NSString) {
-                print("CACHE IMAGE")
-                DispatchQueue.main.async {
-                    self.image.image = cachedImage
-                }
-            }
-            
-            URLSession.shared.dataTask(with: imageUrl) { data, response, error in
-                if let error = error { print(error); return }
-                guard let data = data, let response = response else { return }
-                guard let responseURL = response.url else { return }
-                
-                if responseURL.absoluteString != team.team.image { return }
-                
-                DispatchQueue.main.async {
-                    self.image.image = UIImage(data: imageData)
-                }
-                
-                self.saveImageToCache(data: data, url: imageUrl)
-                
-            }.resume()
+        NetworkManager.shared.loadImage(url: URL(string: team.team.image)) { image in
+            self.image.image = image
         }
     }
     
@@ -155,9 +132,9 @@ class ImageCache {
 }
 
 class StructWrapper<T>: NSObject {
-
+    
     let value: T
-
+    
     init(_ _struct: T) {
         self.value = _struct
     }
