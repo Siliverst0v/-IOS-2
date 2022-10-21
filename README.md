@@ -23,3 +23,8 @@
 ●	UIKit
 
 ●	Остальное на ваше усмотрение
+
+
+Результат:
+
+![6xtgu8](https://user-images.githubusercontent.com/94259002/197288854-9bfeac02-77d1-4009-9ca2-042250731fa8.GIF)
